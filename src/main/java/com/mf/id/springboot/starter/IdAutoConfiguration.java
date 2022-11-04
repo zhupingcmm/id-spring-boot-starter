@@ -1,7 +1,9 @@
 package com.mf.id.springboot.starter;
 
 import com.mf.id.springboot.starter.config.IdConfig;
-import com.mf.id.springboot.starter.core.IdGenerator;
+import com.mf.id.springboot.starter.core.IdGeneratorManager;
+import com.mf.id.springboot.starter.core.impl.RedisIdGeneratorImpl;
+import com.mf.id.springboot.starter.core.impl.ZkIdGeneratorImpl;
 import com.mf.id.springboot.starter.exception.IdException;
 import io.netty.channel.nio.NioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
@@ -33,17 +35,17 @@ public class IdAutoConfiguration {
     public RedissonClient redissonClient () {
         try {
             Config config = new Config();
-            if (idConfig.getClusterServer() != null) {
+            if (idConfig.getRedis().getClusterServer() != null) {
                 config.useClusterServers()
-                        .setPassword(idConfig.getPassword())
-                        .addNodeAddress(idConfig.getClusterServer().getNodeAddress());
+                        .setPassword(idConfig.getRedis().getPassword())
+                        .addNodeAddress(idConfig.getRedis().getClusterServer().getNodeAddress());
             } else {
                 config.useSingleServer()
-                        .setAddress(idConfig.getAddress())
-                        .setDatabase(idConfig.getDatabase())
-                        .setPassword(idConfig.getPassword());
+                        .setAddress(idConfig.getRedis().getAddress())
+                        .setDatabase(idConfig.getRedis().getDatabase())
+                        .setPassword(idConfig.getRedis().getPassword());
             }
-            Codec codec = (Codec) Class.forName(idConfig.getCodec(), true, this.getClass().getClassLoader()).newInstance();
+            Codec codec = (Codec) Class.forName(idConfig.getRedis().getCodec(), true, this.getClass().getClassLoader()).newInstance();
             config.setCodec(codec);
             config.setEventLoopGroup(new NioEventLoopGroup());
             log.info("connecting redis server");
@@ -54,10 +56,20 @@ public class IdAutoConfiguration {
         }
     }
 
+
     @Bean
-    public IdGenerator idGenerator() {
-        return new IdGenerator();
+    public IdGeneratorManager idGeneratorManager () {
+        return new IdGeneratorManager();
     }
 
+    @Bean
+    public RedisIdGeneratorImpl redis () {
+        return new RedisIdGeneratorImpl();
+    }
+
+    @Bean
+    public ZkIdGeneratorImpl zookeeper() {
+        return new ZkIdGeneratorImpl();
+    }
 
 }
