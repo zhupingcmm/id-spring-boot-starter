@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.mf</groupId>
     <artifactId>id-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>id-spring-boot-starter</name>
     <description>id-spring-boot-starter</description>
     <properties>

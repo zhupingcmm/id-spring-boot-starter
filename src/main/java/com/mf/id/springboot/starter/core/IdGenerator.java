@@ -19,6 +19,10 @@ public class IdGenerator {
     @Autowired
     private IdConfig idConfig;
 
+    /**
+     *  get the id
+     * @return
+     */
     public long getId () {
         checkServerConfig();
 
@@ -34,6 +38,14 @@ public class IdGenerator {
         String result = idConfig.getServerId() +  dateTime + seq;
 
        return Long.parseLong(result);
+    }
+
+    /**
+     *  remove the id
+     * @return
+     */
+    public boolean removeId() {
+      return redissonClient.getAtomicLong(getName()).delete();
     }
 
     private void checkServerConfig () {
